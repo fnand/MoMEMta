@@ -154,6 +154,7 @@ set(MOMEMTA_SOURCES
     "modules/BinnedTransferFunctionOnPt.cc"
     "modules/BlockA.cc"
     "modules/BlockB.cc"
+    "modules/BlockC.cc"
     "modules/BlockD.cc"
     "modules/BlockF.cc"
     "modules/BlockG.cc"
@@ -293,6 +294,13 @@ if(EXAMPLES)
     target_link_libraries(example_WW_fullyleptonic momemta)
     set_target_properties(example_WW_fullyleptonic PROPERTIES OUTPUT_NAME
       "WW_fullyleptonic.exe")
+
+
+   add_executable(example_VLQ_test "examples/VLQ_test.cc")
+    target_link_libraries(example_VLQ_test momemta)
+    set_target_properties(example_VLQ_test PROPERTIES OUTPUT_NAME
+      "VLQ_test.exe")
+
 
 endif()
 
