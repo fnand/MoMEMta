@@ -109,11 +109,11 @@ BlockC.blockc = {
 
     pT_is_met = true,
 
-    s12 = 'flatter_s12::s',
+    s12  = 'flatter_s12::s',
     s123 = 'flatter_s123::s',
 
-    --q1 = add_dimension(),
-    --q2 = add_dimension()
+    q1 = add_dimension(),
+    q2 = add_dimension()
 }
 
 -- Loop over block solutions

@@ -50,15 +50,17 @@ int main(int argc, char** argv) {
     // Electron
     //Particle electron { "electron", LorentzVector(16.171895980835, -13.7919054031372, -3.42997527122497, 21.5293197631836), -11 };
     // b-quark
-    Particle b1 { "bjet1", LorentzVector(-26.7908325195313, -30.59294128418, 140.144721984863, 146.66259765625), 5 };
-    // Muon
-    Particle muon { "muon", LorentzVector(35., 17.0896110534668, 53., 66.), -13 };
+//    Particle b1 { "bjet1", LorentzVector(-26.7908325195313, -30.59294128418, 140.144721984863, 146.66259765625), 5 };
+    Particle b1 { "bjet1", LorentzVector(-26790.8325195313, -30592.94128418, 140144.721984863, 146662.59765625), 5 };  
+  // Muon
+    //Particle muon { "muon", LorentzVector(35., 17.0896110534668, 53., 66.), -13 };
+    Particle muon { "muon", LorentzVector(35000., 17089.6110534668, 53000., 66000.), -13 };
     // Anti b-quark
-    Particle lj { "ljet1", LorentzVector(26.6368963276919, -68.04161840859496, 718.2086419584481, 721.955125), 1 };
-
+    //Particle lj { "ljet1", LorentzVector(26.6368963276919, -68.04161840859496, 718.2086419584481, 721.955125), 1 };
+    Particle lj { "ljet1", LorentzVector(26636.8963276919, -68041.61840859496, 718208.6419584481, 721955.125), 1 };
     // MET
-    LorentzVector met { -40.60706386098534, 79.58668685644121 , 0 , 0};
-
+    //LorentzVector met { -40.60706386098534, 79.58668685644121 , 0 , 0};
+    LorentzVector met { -40607.06386098534, 79586.68685644121 , 0 , 0};
     auto start_time = system_clock::now();
     std::vector<std::pair<double, double>> weights = weight.computeWeights({muon, b1, lj}, met);
     auto end_time = system_clock::now();

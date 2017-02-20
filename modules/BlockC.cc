@@ -115,8 +115,6 @@ class BlockC: public Module {
 
             m_met = get<LorentzVector>(met_tag);
 
-	    std::cout << "MET: " ;
-	    std::cout << m_met->Px() << std::endl;
         };
 
         virtual Status work() override {
@@ -129,7 +127,9 @@ class BlockC: public Module {
 
             const LorentzVector& p2 = *m_particles[0];
             const LorentzVector& p3 = *m_particles[1];
-            
+           
+
+ 
 
             // pT will be used to fix the transverse momentum of the reconstructed neutrinos
             // We can either enforce momentum conservation by disregarding the MET, ie:

@@ -169,7 +169,7 @@ std::vector<std::pair<double, double>> MoMEMta::computeWeights(const std::vector
     }
 
     *m_met = met;
-
+	
     for (const auto& module: m_modules) {
         module->beginIntegration();
     }
