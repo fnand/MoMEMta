@@ -23,6 +23,7 @@
 #include <momemta/Unused.h>
 
 #include <TH1D.h>
+#include <TLorentzVector.h>
 
 #include <chrono>
 
@@ -50,17 +51,24 @@ int main(int argc, char** argv) {
     // Electron
     //Particle electron { "electron", LorentzVector(16.171895980835, -13.7919054031372, -3.42997527122497, 21.5293197631836), -11 };
     // b-quark
-//    Particle b1 { "bjet1", LorentzVector(-26.7908325195313, -30.59294128418, 140.144721984863, 146.66259765625), 5 };
-    Particle b1 { "bjet1", LorentzVector(-26790.8325195313, -30592.94128418, 140144.721984863, 146662.59765625), 5 };  
+    //
+     
+    TLorentzVector blor  = TLorentzVector();
+    blor.SetPtEtaPhiE(45511.4765625, 2.0693726539611816, 1.9048484563827515, 183206.515625);
+    Particle b1 { "bjet1", LorentzVector(blor.Px(), blor.Py(),blor.Pz(), blor.E()), 5 };  
   // Muon
-    //Particle muon { "muon", LorentzVector(35., 17.0896110534668, 53., 66.), -13 };
-    Particle muon { "muon", LorentzVector(35000., 17089.6110534668, 53000., 66000.), -13 };
+    TLorentzVector mlor  = TLorentzVector();
+    mlor.SetPtEtaPhiE(37282.54296875, 0.8650407195091248, -2.555448055267334, 52123.66015625);
+    Particle muon { "muon", LorentzVector(mlor.Px(), mlor.Py(),mlor.Pz(), mlor.E()), 13 };
     // Anti b-quark
-    //Particle lj { "ljet1", LorentzVector(26.6368963276919, -68.04161840859496, 718.2086419584481, 721.955125), 1 };
-    Particle lj { "ljet1", LorentzVector(26636.8963276919, -68041.61840859496, 718208.6419584481, 721955.125), 1 };
+    //
+    TLorentzVector llor  = TLorentzVector();
+    llor.SetPtEtaPhiE(30431.296875, 1.264741063117981, -1.1504430770874023, 58653.9765625);
+    Particle lj { "ljet1", LorentzVector(llor.Px(), llor.Py(),llor.Pz(), llor.E()), 0 };
     // MET
-    //LorentzVector met { -40.60706386098534, 79.58668685644121 , 0 , 0};
-    LorentzVector met { -40607.06386098534, 79586.68685644121 , 0 , 0};
+    TLorentzVector metlor  = TLorentzVector();
+    metlor.SetPtEtaPhiE(49928.453125, 0, -0.4170082211494446, 0 );
+    LorentzVector met { metlor.Px(), metlor.Py(),metlor.Pz(), metlor.E()};
     auto start_time = system_clock::now();
     std::vector<std::pair<double, double>> weights = weight.computeWeights({muon, b1, lj}, met);
     auto end_time = system_clock::now();

@@ -1,3 +1,6 @@
+
+load_modules('../MatrixElements/pp_WW_fully_leptonic/libme_pp_WW_fully_leptonic.so')
+
 -- Register inputs
 local electron = declare_input("electron")
 local muon = declare_input("muon")

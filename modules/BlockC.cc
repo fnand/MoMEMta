@@ -107,7 +107,6 @@ class BlockC: public Module {
             InputTag met_tag;
             if (parameters.exists("met")) {
 
-		std::cout << "It sees MET " << std::endl;		
                 met_tag = parameters.get<InputTag>("met");
             } else {
                 met_tag = InputTag({"met", "p4"});
