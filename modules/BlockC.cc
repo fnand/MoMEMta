@@ -23,27 +23,23 @@
 #include <momemta/Types.h>
 #include <momemta/Math.h>
 
-/** \brief \f$\require{cancel}\f$ Final (main) Block D, describing \f$X + s_{134} (\to p_4 + s_{13} (\to \cancel{p_1} p_3)) + s_{256} (\to p_6 + s_{25} (\to \cancel{p_2} p_5))\f$
+/** \brief \f$\require{cancel}\f$ Final (main) Block C, describing \f$q_1 q_2 \to \f$X + s_{123} (\to p_3 + s_{12} (\to \cancel{p_1} p_2))\f$
  *
  * This Block addresses the change of variables needed to pass from the standard phase-space
- * parametrisation for \f$p_{1 \dots 6} \times \delta^4\f$ to a parametrisation in terms of the four (squared) masses
+ * parametrisation for \f$p_{1 \dots 3} \times \delta^4\f$ to a parametrisation in terms of the two (squared) masses
  * of the intermediate propagators.
  *
- * The integration is performed over \f$s_{13}, s_{134}, s_{25}, s_{256}\f$ with \f$p_{3 \dots 6}\f$ as input. Per integration point,
- * the LorentzVector of the invisible particles, \f$p_1\f$ and \f$p_2\f$, are computed based on the following set
+ * The integration is performed over \f$s_{12}, s_{123}\f$ with \f$p_{1 \dots 3}\f$ as input. Per integration point,
+ * the LorentzVector of the invisible particle, \f$p_1\f$, is computed based on the following set
  * of equations:
  *
- * - \f$s_{13} = (p_1 + p_3)^2\f$
- * - \f$s_{134} = (p_1 + p_3 + p_4)^2\f$
- * - \f$s_{25} = (p_2 + p_5)^2\f$
- * - \f$s_{256} = (p_2 + p_5 + p_6)^2\f$
- * - Conservation of momentum (with \f$\vec{p}_T^{tot}\f$ the total transverse momentum of visible particles):
- *  - \f$p_{1x} + p_{2x} = - p_{Tx}^{tot}\f$
- *  - \f$p_{1y} + p_{2y} = - p_{Ty}^{tot}\f$
- * - \f$p_1^2 = m_1^2 = 0\f$ (FIXME)
- * - \f$p_2^2 = m_2^2 = 0\f$ (FIXME)
+ * - \f$s_{12} = (p_1 + p_2)^2\f$
+ * - \f$s_{123} = (p_1 + p_2 + p_3)^2\f$
+ * - Conservation of momentum (with \f$\vec{p}_T^{branches}\f$ the total transverse momentum of all branches represented):
+ *  - \f$p_{1x} + E_3 \sin\theta_3\cos\phi_3 = - p_{Tx}^{branches}\f$
+ *  - \f$p_{1y} + E_3 \sin\theta_3\cos\phi_3 = - p_{Ty}^{branches}\f$
  *
- * Up to four solutions are possible for \f$(p_1, p_2)\f$.
+ * Up to four solutions are possible for \f$(E1, \alpha)\f$, where \f$\alpha = 2p_1\dotp_2\f$.
  *
  * ### Integration dimension
  *
@@ -65,18 +61,18 @@
  *
  *   | Name | Type | %Description |
  *   |------|------|--------------|
- *   | `s13` <br/> `s134` <br/> `s25` <br/> `s256` | double | Squared invariant masses of the propagators. Typically coming from a BreitWignerGenerator or NarrowWidthApproximation module. |
- *   | `p3` ... `p6` | LorentzVector | LorentzVectors of the particles used to reconstruct the event according to the above method. |
- *   | `branches` | vector(LorentzVector) | LorentzVectors of all the other particles in the event, taken into account when computing \f$\vec{p}_{T}^{tot}\f$ (if MET is not used), and checking if the solutions are physical. |
+ *   | `s12` <br/> `s123` <br/>  | double | Squared invariant masses of the propagators. Typically coming from a BreitWignerGenerator or NarrowWidthApproximation module. |
+ *   | `p1` ... `p3` | LorentzVector | LorentzVectors of the particles used to reconstruct the event according to the above method. |
+ *   | `branches` | vector(LorentzVector) | LorentzVectors of all the other particles in the event, taken into account when computing \f$\vec{p}_{T}^{branches}\f$ (if MET is not used), and checking if the solutions are physical. |
  *   | `met` | LorentzVector, default `met::p4` | LorentzVector of the MET |
  *
  * ### Outputs
  *
  *   | Name | Type | %Description |
  *   |------|------|--------------|
- *   | `solutions` | vector(Solution) | Solutions of the change of variable. Each solution embed  the LorentzVectors of the invisible particles (ie. one \f$(p_1, p_2)\f$ pair) and the associated jacobian. These solutions should be fed as input to the Looper module. |
+ *   | `solutions` | vector(Solution) | Solutions of the change of variable. Each solution embed  the LorentzVectors of the invisible particle (ie. \f$(p_1)\f$) and the associated jacobian. These solutions should be fed as input to the Looper module. |
  *
- * \note This block has been validated and is safe to use.
+ * \note This block has NOT been validated and is NOT safe to use.
  *
  * \sa Looper module to loop over the solutions of this Block
  *
