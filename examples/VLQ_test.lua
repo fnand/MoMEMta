@@ -69,13 +69,13 @@ if USE_TF then
     }
     muon.set_gen_p4("tf_p3::output")
 
---[[    GaussianTransferFunctionOnEnergy.tf_p4 = {
+    GaussianTransferFunctionOnEnergy.tf_p4 = {
         ps_point = add_dimension(),
         reco_particle = ljet1.reco_p4,
         sigma = 0.10,
     }
     ljet1.set_gen_p4("tf_p4::output")
-]]
+
     -- BinnedTransferFunctionOnEnergy.tf_p4 = {
     --     ps_point = add_dimension(),
     --     reco_particle = 'input::particles/4',
@@ -92,7 +92,7 @@ inputs = {
     
     muon.gen_p4,
     bjet1.gen_p4,
- --   ljet1.gen_p4
+    --ljet1.gen_p4
 }
 
 StandardPhaseSpace.phaseSpaceOut = {
@@ -104,7 +104,7 @@ StandardPhaseSpace.phaseSpaceOut = {
 BlockC.blockc = {
     p2 = inputs[1],
     p3 = inputs[2],
-  --  p4 = inputs[3],
+    --p4 = inputs[3],
     
 
     pT_is_met = true,
@@ -163,7 +163,7 @@ Looper.looper = {
           },
 
           {
-            pdg_id = -13,
+            pdg_id = 13,
             me_index = 3,
           },
 
