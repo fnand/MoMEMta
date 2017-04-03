@@ -12,6 +12,14 @@ target_link_libraries(test_psVol_blockB momemta)
 set_target_properties(test_psVol_blockB PROPERTIES OUTPUT_NAME
   "phaseSpaceVolume_blockB.exe")
 
+### BlockC
+
+add_executable(test_psVol_blockC "blockC.cc")
+target_link_libraries(test_psVol_blockC momemta)
+set_target_properties(test_psVol_blockC PROPERTIES OUTPUT_NAME
+  "phaseSpaceVolume_blockC.exe")
+
+
 ### BlockD
 
 add_executable(test_psVol_blockD "blockD.cc")
