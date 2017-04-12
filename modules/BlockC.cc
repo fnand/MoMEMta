@@ -89,6 +89,8 @@ class BlockC: public Module {
             s12  = get<double>(parameters.get<InputTag>("s12"));
             s123 = get<double>(parameters.get<InputTag>("s123"));
 
+	    
+
             m_particles.push_back(get<LorentzVector>(parameters.get<InputTag>("p2")));
             m_particles.push_back(get<LorentzVector>(parameters.get<InputTag>("p3")));
             
@@ -117,7 +119,11 @@ class BlockC: public Module {
             solutions->clear();
 
             // Don't spend time on unphysical corner of the phase-space
-            if (*s12 >= *s123 || *s12 >= SQ(sqrt_s) || *s123 >= SQ(sqrt_s) )
+            
+            //std::cout << "s12:   " << *s12  << std::endl;
+            //std::cout << "s123:  " << *s123 << std::endl;
+            //std::cout << "ptr to s12" << s12 << std::endl;
+ 	    if (*s12 >= *s123 || *s12 >= SQ(sqrt_s) || *s123 >= SQ(sqrt_s) )
                 return Status::NEXT;
 
             const LorentzVector& p2 = *m_particles[0];
@@ -145,33 +151,43 @@ class BlockC: public Module {
                 }
             }
 
-            // p1x = alpha1 E1 + beta1 Alpha + gamma1
+            // p1x = alpha1 E1 + beta1 ALPHA + gamma1
             // p1y = ...(2)
             // p1z = ...(3)
 	    // E3  = ...(4)            
 
- 	    // Scalar product of three-momenta of p2 and p3
-	    const double p2dotp3 = p2.Px()*p3.Px() +  p2.Py()*p3.Py() + p2.Pz()*p3.Pz();
+	    const double p2Sq    = p2.E()*p2.E() - p2.Px()*p2.Px() -  p2.Py()*p2.Py() - p2.Pz()*p2.Pz();
+	    const double cosphi = std::cos(p3.Phi());
+            const double sinphi = std::sin(p3.Phi());
+            const double costhe = std::cos(p3.Theta());
+            const double sinthe = std::sin(p3.Theta());
+	    
+	    // Denominator that appears in several of the follwing eq.
+	    // No need to compute it multiple times
+	    const double denom = 2.*(p2.E() -p2.Pz()*cosphi - p2.Px()*costhe*sinphi - p2.Py()*sinthe*sinphi );
 
 
             const double alpha1 = 0.;
-            const double beta1  = (std::cos(p3.phi())*std::sin(p3.theta()))/(2.*p2.E());
-            const double gamma1 = (-2*p2.E()*pT.Px() - 2*p2dotp3*std::cos(p3.phi())*std::sin(p3.theta()) + *s12*std::cos(p3.phi())*std::sin(p3.theta()) - *s123*std::cos(p3.phi())*std::sin(p3.theta()))/(2.*p2.E());
+            const double beta1  = (cosphi*sinthe)/denom;
+            const double gamma1 = -(2*p2.E()*pT.Px() - 2*p2.Pz()*pT.Px()*cosphi - *s12*cosphi*sinthe + *s123*cosphi*sinthe -2*p2.Px()*pT.Px()*costhe*sinphi -2*p2.Py()*pT.Px()*sinthe*sinphi)/denom;
 
 
             const double alpha2 = 0.;
-            const double beta2  = (std::sin(p3.theta())*std::sin(p3.phi()))/(2.*p2.E());
-            const double gamma2 = (-2*p2.E()*pT.Py() - 2*p2dotp3*std::sin(p3.theta())*std::sin(p3.phi()) + *s12*std::sin(p3.theta())*std::sin(p3.phi()) - *s123*std::sin(p3.theta())*std::sin(p3.phi()))/(2.*p2.E());
+            const double beta2  = (sinthe*sinphi)/denom;
+            const double gamma2 = -(2*p2.E()*pT.Py() - 2*p2.Pz()*pT.Py()*cosphi - 2*p2.Px()*pT.Py()*costhe*sinphi - 2*p2.Py()*pT.Py()*sinthe*sinphi - *s12*sinthe*sinphi + *s123*sinthe*sinphi)/denom;
 
 
-            const double alpha3 = (p2.E())/p2.Pz();
-            const double beta3  = (-(p2.Px()*std::cos(p3.phi())*std::sin(p3.theta())) - p2.Py()*std::sin(p3.theta())*std::sin(p3.phi()))/(2.*p2.E()*p2.Pz());
-            const double gamma3 = (2*p2.E()*p2.Px()*pT.Px() + 2*p2.E()*p2.Py()*pT.Py() - p2.E()*(*s12) + 2*p2dotp3*p2.Px()*std::cos(p3.phi())*std::sin(p3.theta()) - p2.Px()*(*s12)*std::cos(p3.phi())*std::sin(p3.theta()) + p2.Px()*(*s123)*std::cos(p3.phi())*std::sin(p3.theta()) + 2*p2dotp3*p2.Py()*std::sin(p3.theta())*std::sin(p3.phi()) -
-      p2.Py()*(*s12)*std::sin(p3.theta())*std::sin(p3.phi()) + p2.Py()*(*s123)*std::sin(p3.theta())*std::sin(p3.phi()))/(2.*p2.E()*p2.Pz());
+            const double alpha3 = 2*(-SQ(p2.E()) + p2.E()*p2.Pz()*cosphi + p2.E()*p2.Px()*costhe*sinphi + p2.E()*p2.Py()*sinthe*sinphi)/(-p2.Pz()*denom);
+            const double beta3  = (p2.Px()*cosphi*sinthe + p2.Py()*sinthe*sinphi)/(-p2.Pz()*denom);
+
+            const double gamma3 = (-p2Sq*p2.E() - 2*p2.E()*p2.Px()*pT.Px() - 2*p2.E()*p2.Py()*pT.Py() + p2.E()*(*s12) + p2Sq*p2.Pz()*cosphi + 2*p2.Px()*p2.Pz()*pT.Px()*cosphi 
+				  + 2*p2.Py()*p2.Pz()*pT.Py()*cosphi - p2.Pz()*(*s12)*cosphi + p2.Px()*(*s12)*cosphi*sinthe - p2.Px()*(*s123)*cosphi*sinthe + p2Sq*p2.Px()*costhe*sinphi 
+				  + 2*SQ(p2.Px())*pT.Px()*costhe*sinphi + 2*p2.Px()*p2.Py()*pT.Py()*costhe*sinphi - p2.Px()*(*s12)*costhe*sinphi + p2Sq*p2.Py()*sinthe*sinphi  
+                                  + 2*p2.Px()*p2.Py()*pT.Px()*sinthe*sinphi + 2*SQ(p2.Py())*pT.Py()*sinthe*sinphi - p2.Py()*(*s123)*sinthe*sinphi)/(-p2.Pz()*denom);
 
             const double alpha4 = 0.;
-            const double beta4  = -1./(2.*p2.E());
-            const double gamma4 = (2*p2dotp3 - *s12 + *s123)/(2.*p2.E());
+            const double beta4  = -1./denom;
+            const double gamma4 = ( *s123- *s12)/denom;
 
 
 
@@ -181,12 +197,12 @@ class BlockC: public Module {
             // a11 E1^2 + a22 ALPHA^2 + a12 E1*ALPHA + a10 E1 + a01 ALPHA + a00 = 0
             // id. with bij
 
-            const double a11 = alpha4;
-            const double a22 = 0.;
-            const double a12 = beta4;
-            const double a10 = gamma4 - p3.Px()*alpha1 - p3.Py()*alpha2 - p3.Pz()*alpha3;
-            const double a01 = -1     - p3.Px()*beta1  - p3.Py()*beta2  - p3.Pz()*beta3;
-            const double a00 =        -p3.Px()*gamma1  - p3.Py()*gamma2 - p3.Pz()*gamma3;
+            const double a11 = alpha4*(1- alpha1*costhe*sinphi - alpha2*sinthe*sinphi - alpha3*cosphi);
+            const double a22 = beta4*(  -  beta1*costhe*sinphi -  beta2*sinthe*sinphi - beta3*cosphi );
+            const double a12 = beta4  - (alpha1*beta4  + alpha4*beta1)*costhe*sinphi  - (alpha2*beta4  + alpha4*beta2)*sinthe*sinphi  - (alpha3*beta4  + alpha4*beta3)*cosphi;
+            const double a10 = gamma4 - (alpha1*gamma4 + alpha4*gamma1)*costhe*sinphi - (alpha2*gamma4 + alpha4*gamma2)*sinthe*sinphi - (alpha3*gamma4 + alpha4*gamma3)*cosphi;
+            const double a01 = -0.5   - (beta1*gamma4  + beta4*gamma1)*costhe*sinphi  - (beta2*gamma4  + beta4*gamma2)*sinthe*sinphi  - (beta3*gamma4  + beta4*gamma3)*cosphi;
+            const double a00 = gamma4* (- gamma1*costhe*sinphi - gamma2*sinthe*sinphi - gamma3*cosphi);
 
             const double b11 = SQ(alpha1) + SQ(alpha2) + SQ(alpha3) - 1;
             const double b22 = SQ(beta1)  + SQ(beta2)  + SQ(beta3);
@@ -195,11 +211,11 @@ class BlockC: public Module {
             const double b01 = 2.*( beta1*gamma1  + beta2*gamma2  + beta3*gamma3  );
             const double b00 = SQ(gamma1) + SQ(gamma2) + SQ(gamma3);
 
-            // Find the intersection of the 2 conics (at most 4 real solutions for (E1,E2))
+            // Find the intersection of the 2 conics (at most 4 real solutions for (E1,ALPHA))
             std::vector<double> E1, ALPHA;
             solve2Quads(a11, a22, a12, a10, a01, a00, b11, b22, b12, b10, b01, b00, E1, ALPHA, false);
 
-            // For each solution (E1,E2), find the neutrino 4-momenta p1,p2
+            // For each solution (E1,ALPHA), find the neutrino 4-momentum p1
 
             if (E1.size() == 0)
                 return Status::NEXT;
