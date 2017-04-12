@@ -237,8 +237,13 @@ class BlockC: public Module {
 
 	
 		//FIXME this needs to be changes. What does the alpha requirement translate to?
-                if (e1 < 0. )//|| alp < 0.)
+                if (e1 < 0.) //|| alp < 0.)
                     continue;
+		
+		// Make sure E3 is larger than zero 
+		if (alpha4*e1 + beta4*alp + gamma4  < 0.) //|| alp < 0.)
+                    continue;
+
 
                 LorentzVector p1(
                         alpha1*e1 + beta1*alp + gamma1,
@@ -250,8 +255,11 @@ class BlockC: public Module {
                         (alpha4*e1 + beta4*alp + gamma4)*sinthe*cosphi,
                         (alpha4*e1 + beta4*alp + gamma4)*sinthe*sinphi,
                         (alpha4*e1 + beta4*alp + gamma4)*costhe,
-                        alpha4*e1 + beta4*alp + gamma4);
+                         alpha4*e1 + beta4*alp + gamma4);
 
+
+	//	std::cout << "Mass of p3 " << p3.M() << std::endl;
+		//std::cout << "E3 " << alpha4*e1 + beta4*alp + gamma4 << std::endl;
 
 
 		//std::cout << "met.Px " << (*m_met).Px() << "  met.Py " << (*m_met).Py() << std:: endl;
@@ -279,7 +287,8 @@ class BlockC: public Module {
                     continue;
 
                 double jacobian = computeJacobian(p1, p2, p3);
-                // FIXME do I need to multiply jac by pi*constant?
+                
+		// FIXME do I need to multiply jac by pi*constant?
 		Solution s {{p1}, M_PI*jacobian, true };
                 solutions->push_back(s);
             }
