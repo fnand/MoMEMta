@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
     MoMEMta weight(configuration.freeze());
 
     // b-quark
-    Particle p2 { "p2", LorentzVector(-50, 0, 0, 50), 0 };
+    Particle p2 { "p2", LorentzVector(50, 0, 0, 50), 0 };
     // Muon
     Particle p3 { "p3", LorentzVector(0, 50, 0, 50), 0 };
     // Anti b-quark

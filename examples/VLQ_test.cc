@@ -54,26 +54,23 @@ int main(int argc, char** argv) {
     //
      
     TLorentzVector blor  = TLorentzVector();
-    //blor.SetPtEtaPhiE(45511.4765625, 2.0693726539611816, 1.9048484563827515, 183206.515625);
-    blor.SetPtEtaPhiE(45.5114765625, 2.0693726539611816, 1.9048484563827515, 183.206515625);
+    blor.SetPtEtaPhiE(45511.4765625, 2.0693726539611816, 1.9048484563827515, 183206.515625);
 
-    Particle b1 { "bjet1", LorentzVector(blor.Px(), blor.Py(),blor.Pz(), blor.E()), 5 };  
+    Particle b1 { "bjet1", LorentzVector(blor.Px()/1000., blor.Py()/1000.,blor.Pz()/1000., blor.E()/1000.), 5 };  
   // Muon
     TLorentzVector mlor  = TLorentzVector();
-    //mlor.SetPtEtaPhiE(37282.54296875, 0.8650407195091248, -2.555448055267334, 52123.66015625);
-    mlor.SetPtEtaPhiE(37.28254296875, 0.8650407195091248, -2.555448055267334, 52.12366015625);
-    Particle muon { "muon", LorentzVector(mlor.Px(), mlor.Py(),mlor.Pz(), mlor.E()), 13 };
+    mlor.SetPtEtaPhiE(37282.54296875, 0.8650407195091248, -2.555448055267334, 52123.66015625);
+    Particle muon { "muon", LorentzVector(mlor.Px()/1000., mlor.Py()/1000.,mlor.Pz()/1000., mlor.E()/1000.), 13 };
     // Anti b-quark
     //
     TLorentzVector llor  = TLorentzVector();
-    //llor.SetPtEtaPhiE(30431.296875, 1.264741063117981, -1.1504430770874023, 58653.9765625);
-    llor.SetPtEtaPhiE(30.431296875, 1.264741063117981, -1.1504430770874023, 58.6539765625);
-    Particle lj { "ljet1", LorentzVector(llor.Px(), llor.Py(),llor.Pz(), llor.E()), 0 };
+    llor.SetPtEtaPhiE(30431.296875, 1.264741063117981, -1.1504430770874023, 58653.9765625);
+    Particle lj { "ljet1", LorentzVector(llor.Px()/1000., llor.Py()/1000.,llor.Pz()/1000., llor.E()/1000.), 0 };
     // MET
     TLorentzVector metlor  = TLorentzVector();
-    //metlor.SetPtEtaPhiE(49928.453125, 0, -0.4170082211494446, 0 );
-    metlor.SetPtEtaPhiE(49.928453125, 0, -0.4170082211494446, 0 );
-    LorentzVector met { metlor.Px(), metlor.Py(),metlor.Pz(), metlor.E()};
+    metlor.SetPtEtaPhiE(49928.453125, 0, -0.4170082211494446, 0 );
+    LorentzVector met { metlor.Px()/1000., metlor.Py()/1000.,metlor.Pz()/1000., metlor.E()/1000.};
+    
     auto start_time = system_clock::now();
     std::vector<std::pair<double, double>> weights = weight.computeWeights({muon, b1, lj}, met);
     auto end_time = system_clock::now();
