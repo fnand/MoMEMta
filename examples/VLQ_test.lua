@@ -104,7 +104,7 @@ StandardPhaseSpace.phaseSpaceOut = {
 BlockC.blockc = {
     p2 = inputs[1],
     p3 = inputs[2],
-    --p4 = inputs[3],
+    p4 = inputs[3],
     
 
     pT_is_met = true,

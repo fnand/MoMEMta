@@ -89,7 +89,7 @@ class BlockC: public Module {
             s12  = get<double>(parameters.get<InputTag>("s12"));
             s123 = get<double>(parameters.get<InputTag>("s123"));
 
-	    
+	    m1 = parameters.get<double>("m1", 0.);
 
             m_particles.push_back(get<LorentzVector>(parameters.get<InputTag>("p2")));
             m_particles.push_back(get<LorentzVector>(parameters.get<InputTag>("p3")));
@@ -120,9 +120,6 @@ class BlockC: public Module {
 
             // Don't spend time on unphysical corner of the phase-space
             
-            //std::cout << "s12:   " << *s12  << std::endl;
-            //std::cout << "s123:  " << *s123 << std::endl;
-            //std::cout << "ptr to s12" << s12 << std::endl;
  	    if (*s12 >= *s123 || *s12 >= SQ(sqrt_s) || *s123 >= SQ(sqrt_s) )
                 return Status::NEXT;
 
@@ -156,34 +153,48 @@ class BlockC: public Module {
             // p1z = ...(3)
 	    // E3  = ...(4)            
 
-	    const double p2Sq    = p2.Dot(p2);
+	    const double p2Sq   = p2.Dot(p2);
 	    const double cosphi = std::cos(p3.Phi());
             const double sinphi = std::sin(p3.Phi());
             const double costhe = std::cos(p3.Theta());
             const double sinthe = std::sin(p3.Theta());
-	    
+	  
+
+ 
+	    const double E2  = p2.E();
+            const double p2x = p2.Px();
+            const double p2y = p2.Py();
+            const double p2z = p2.Pz();
+
+
+	    const double pTx = pT.Px();
+            const double pTy = pT.Py();
+            
+
+ 
 	    // Denominator that appears in several of the follwing eq.
 	    // No need to compute it multiple times
-	    const double denom = 2.*(p2.E() -p2.Pz()*costhe - p2.Px()*cosphi*sinthe - p2.Py()*sinthe*sinphi );
+	    const double denom = 2.*(E2 - p2z*costhe - p2x*cosphi*sinthe - p2y*sinthe*sinphi );
 
 
             const double alpha1 = 0.;
             const double beta1  = (cosphi*sinthe)/denom;
-            const double gamma1 = -(2*p2.E()*pT.Px() - 2*p2.Pz()*pT.Px()*costhe - *s12*cosphi*sinthe + *s123*cosphi*sinthe -2*p2.Px()*pT.Px()*cosphi*sinthe -2*p2.Py()*pT.Px()*sinthe*sinphi)/denom;
+            const double gamma1 = -(2*E2*pTx - 2*p2z*pTx*costhe - *s12*cosphi*sinthe + *s123*cosphi*sinthe -2*p2x*pTx*cosphi*sinthe -2*p2y*pTx*sinthe*sinphi)/denom;
 
 
             const double alpha2 = 0.;
             const double beta2  = (sinthe*sinphi)/denom;
-            const double gamma2 = -(2*p2.E()*pT.Py() - 2*p2.Pz()*pT.Py()*costhe - 2*p2.Px()*pT.Py()*cosphi*sinthe - 2*p2.Py()*pT.Py()*sinthe*sinphi - *s12*sinthe*sinphi + *s123*sinthe*sinphi)/denom;
+            const double gamma2 = -(2*E2*pTy - 2*p2z*pTy*costhe - 2*p2x*pTy*cosphi*sinthe - 2*p2y*pTy*sinthe*sinphi - *s12*sinthe*sinphi + *s123*sinthe*sinphi)/denom;
 
 
-            const double alpha3 = 2*(-SQ(p2.E()) + p2.E()*p2.Pz()*costhe + p2.E()*p2.Px()*cosphi*sinthe + p2.E()*p2.Py()*sinthe*sinphi)/(-p2.Pz()*denom);
-            const double beta3  = (p2.Px()*cosphi*sinthe + p2.Py()*sinthe*sinphi)/(-p2.Pz()*denom);
+            const double alpha3 = 2*(-SQ(E2) + E2*p2z*costhe + E2*p2x*cosphi*sinthe + E2*p2y*sinthe*sinphi)/(-p2z*denom);
+            const double beta3  = (p2x*cosphi*sinthe + p2y*sinthe*sinphi)/(-p2z*denom);
+            const double gamma3 = (-SQ(m1)*E2 -p2Sq*E2 - 2*E2*p2x*pTx - 2*E2*p2y*pTy + E2*(*s12) + SQ(m1)*p2z*costhe 
+				  + p2Sq*p2z*costhe + 2*p2x*p2z*pTx*costhe + 2*p2y*p2z*pTy*costhe - p2z*(*s12)*costhe  
+				  + SQ(m1)*p2x*cosphi*sinthe  + p2Sq*p2x*cosphi*sinthe + 2*SQ(p2x)*pTx*cosphi*sinthe + 2*p2x*p2y*pTy*cosphi*sinthe 
+				  - p2x*(*s123)*cosphi*sinthe + SQ(m1)*p2y*sinthe*sinphi + p2Sq*p2y*sinthe*sinphi  
+                                  + 2*p2x*p2y*pTx*sinthe*sinphi + 2*SQ(p2y)*pTy*sinthe*sinphi - p2y*(*s123)*sinthe*sinphi)/(-p2z*denom);
 
-            const double gamma3 = (-p2Sq*p2.E() - 2*p2.E()*p2.Px()*pT.Px() - 2*p2.E()*p2.Py()*pT.Py() + p2.E()*(*s12) + p2Sq*p2.Pz()*costhe + 2*p2.Px()*p2.Pz()*pT.Px()*costhe 
-				  + 2*p2.Py()*p2.Pz()*pT.Py()*costhe - p2.Pz()*(*s12)*costhe + p2Sq*p2.Px()*cosphi*sinthe   
-				  + 2*SQ(p2.Px())*pT.Px()*cosphi*sinthe + 2*p2.Px()*p2.Py()*pT.Py()*cosphi*sinthe - p2.Px()*(*s123)*cosphi*sinthe + p2Sq*p2.Py()*sinthe*sinphi  
-                                  + 2*p2.Px()*p2.Py()*pT.Px()*sinthe*sinphi + 2*SQ(p2.Py())*pT.Py()*sinthe*sinphi - p2.Py()*(*s123)*sinthe*sinphi)/(-p2.Pz()*denom);
 
             const double alpha4 = 0.;
             const double beta4  = -1./denom;
@@ -204,24 +215,19 @@ class BlockC: public Module {
             const double a01 = -0.5   - (beta1*gamma4  + beta4*gamma1)*sinthe*cosphi  - (beta2*gamma4  + beta4*gamma2)*sinthe*sinphi  - (beta3*gamma4  + beta4*gamma3)*costhe;
             const double a00 = gamma4* (- gamma1*sinthe*cosphi - gamma2*sinthe*sinphi - gamma3*costhe);
 
-            //std::cout << "a11: " << a11 << "  a22: " << a22 << "  a12: " << a12 << "  a10: " << a10 << "  a01: " << a01 << "  a00: " << a00 << std::endl;
-            
 
             const double b11 = SQ(alpha1) + SQ(alpha2) + SQ(alpha3) - 1;
             const double b22 = SQ(beta1)  + SQ(beta2)  + SQ(beta3);
             const double b12 = 2.*( alpha1*beta1  + alpha2*beta2  + alpha3*beta3  );
             const double b10 = 2.*( alpha1*gamma1 + alpha2*gamma2 + alpha3*gamma3 );
             const double b01 = 2.*( beta1*gamma1  + beta2*gamma2  + beta3*gamma3  );
-            const double b00 = SQ(gamma1) + SQ(gamma2) + SQ(gamma3);
+            const double b00 = SQ(gamma1) + SQ(gamma2) + SQ(gamma3) + SQ(m1);
 
 
-            //std::cout << "b11: " << b11 << "  b22: " << b22 << "  b12: " << b12 << "  b10: " << b10 << "  b01: " << b01 << "  b00: " << b00 << std::endl;
 
             // Find the intersection of the 2 conics (at most 4 real solutions for (E1,ALPHA))
             std::vector<double> E1, ALPHA;
-	    //std::cout << "Beg" << std::endl;
             solve2Quads(a11, a22, a12, a10, a01, a00, b11, b22, b12, b10, b01, b00, E1, ALPHA, false);
-	    //std::cout << "End" << std::endl;
 
 
 
@@ -236,13 +242,13 @@ class BlockC: public Module {
                 const double alp = ALPHA.at(i);
 
 	
-		//FIXME this needs to be changes. What does the alpha requirement translate to?
-                if (e1 < 0.) //|| alp < 0.)
+		//Make sure E1 is not negative
+                if (e1 < 0.) 
                     continue;
 		
-		// Make sure E3 is larger than zero 
-		if (alpha4*e1 + beta4*alp + gamma4  < 0.) //|| alp < 0.)
-                    continue;
+		// Make sure E3 is not negative 
+		if (alpha4*e1 + beta4*alp + gamma4  < 0.) 
+                   continue;
 
 
                 LorentzVector p1(
@@ -258,25 +264,30 @@ class BlockC: public Module {
                          alpha4*e1 + beta4*alp + gamma4);
 
 
-	//	std::cout << "Mass of p3 " << p3.M() << std::endl;
-		//std::cout << "E3 " << alpha4*e1 + beta4*alp + gamma4 << std::endl;
-
-
-		//std::cout << "met.Px " << (*m_met).Px() << "  met.Py " << (*m_met).Py() << std:: endl;
-		//std::cout << "p1.Px " << p1.Px() << "  p1.Py " << p1.Py() <<  std:: endl;
-		//std::cout << "s12       " << *s12 << std::endl;
-		//std::cout << "(p1 + p2)^2:  " << p1.Dot(p1) + p2.Dot(p2) + 2*p1.Dot(p2)  << std::endl;
 	
 
 		//std::cout << "s123      " << *s123 << std::endl;
                 //std::cout << "(p1 + p2 + p3)^2:  " << p1.Dot(p1) + p2.Dot(p2) + p3.Dot(p3) + 2*p1.Dot(p2) + 2*p1.Dot(p3) + 2*p2.Dot(p3)  << std::endl;	
-                // Check if solutions are physical
-                //
-                //
-                //std::cout << "p2x + p3x  "  <<p2.Px() +  p3.Px() << std::endl;
-		//std::cout << "-pTx  " << - pT.Px()  << std::endl;
+              
+		//This value is supposed to be equal to s123
+		double p123sq = p1.Dot(p1) + p2.Dot(p2) + p3.Dot(p3) + 2*p1.Dot(p2) + 2*p1.Dot(p3) + 2*p2.Dot(p3); 
+		
+
+		//std::cout << fabs(p123sq - *s123) << std::endl; 
+		//Is this too tight of a constraint? FIXME
+		if ( fabs(p123sq - *s123)  > (*s123)*std::numeric_limits<double>::epsilon()  )
+                   continue;
+
+		//This value is supposed to be equal to s12
+		double p12sq = p1.Dot(p1) + p2.Dot(p2) + 2*p1.Dot(p2);
+			
+		if ( fabs(p12sq - *s12)  > (*s12)*std::numeric_limits<double>::epsilon()  )
+                   continue;
 
 
+ 
+
+		// Check if solutions are physical
                 LorentzVector tot = p1 + p2 + p3;
                 for (size_t i = 0; i < m_branches.size(); i++) {
                     tot += *m_branches[i];
@@ -350,6 +361,8 @@ class BlockC: public Module {
         std::vector<Value<LorentzVector>> m_particles;
         std::vector<Value<LorentzVector>> m_branches;
         Value<LorentzVector> m_met;
+
+	double m1;
 
         // Outputs
         std::shared_ptr<SolutionCollection> solutions = produce<SolutionCollection>("solutions");
